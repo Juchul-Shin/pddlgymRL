@@ -1,6 +1,6 @@
 import random
 from random import randint
-
+import os
 
 INITIAL_FIXED_POSITON = '\t\tdrone-at pos-3-1\n'
 INITIAL_FIXED_DIRECTION = 't\tdrone-dir east\n'
@@ -18,9 +18,9 @@ class ProblemGenerator():
         self.problem_number = 0
 
     def generate_problem(self, index=0):
-        filename = 'problem{0}.pddl'.format(index)
+        filename = './pddlgym/pddl/drone/problem{0}.pddl'.format(index)
         f = open(filename, 'w')
-        f.write('define (problem drone)(:domain drone)\n')
+        f.write('(define (problem drone)(:domain drone)\n')
         f.write(self.generate_objects())
         f.write(self.generate_init())
         f.write(self.generate_goal())
@@ -37,13 +37,13 @@ class ProblemGenerator():
         return objects_string
 
     def generate_init(self):
-        init_string = '\t(:init)\n'
+        init_string = '\t(:init\n'
         if (self.is_fixed_init):
             init_string += INITIAL_FIXED_POSITON
             init_string += INITIAL_FIXED_DIRECTION
         else:
-            init_string += '\t\tdrone-at pos-{0}-{1}'.format(randint(1, 6), randint(1, 6))
-            init_string += '\t\tdronr-dir {0}'.format(DIR_LIST[randint(0, 4)])
+            init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(randint(1, 6), randint(1, 6))
+            init_string += '\t\t(dronr-dir {0})\n'.format(DIR_LIST[randint(0, 3)])
         init_string += self.generate_static_predicates()
         init_string += '\t)\n'
         return init_string
@@ -62,7 +62,6 @@ class ProblemGenerator():
                     destination, newdir = self.move_left(x, y, dir)
                     if (destination):
                         static_predicates += '\t\t(movable-left pos-{0}-{1} '.format(x, y) + destination + dir + ' ' + newdir + ')\n'
-        static_predicates += '\t)\n'
         return static_predicates
 
     def move_forward(self, x, y, dir):
@@ -81,7 +80,7 @@ class ProblemGenerator():
             dest_x = x+1
             dest_y = y
 
-        if ((dest_x > self.grid_size or dest_x < 1) and (dest_y > self.grid_size or dest_y < 1)):
+        if ((dest_x > self.grid_size or dest_x < 1) or (dest_y > self.grid_size or dest_y < 1)):
             return None
         else:
             return 'pos-{0}-{1}'.format(dest_x, dest_y) + ' '
@@ -103,7 +102,7 @@ class ProblemGenerator():
             dest_y = y-1
 
         new_dir = DIR_LIST[(DIR_LIST.index(dir)+1)%4]
-        if ((dest_x > self.grid_size or dest_x < 1) and (dest_y > self.grid_size or dest_y < 1)):
+        if ((dest_x > self.grid_size or dest_x < 1) or (dest_y > self.grid_size or dest_y < 1)):
             return None, None
         else:
             return 'pos-{0}-{1}'.format(dest_x, dest_y) + ' ', new_dir
@@ -129,7 +128,7 @@ class ProblemGenerator():
             new_index = 3
         new_dir = DIR_LIST[new_index]
 
-        if ((dest_x > self.grid_size or dest_x < 1) and (dest_y > self.grid_size or dest_y < 1)):
+        if ((dest_x > self.grid_size or dest_x < 1) or (dest_y > self.grid_size or dest_y < 1)):
             return None, None
         else:
             return 'pos-{0}-{1}'.format(dest_x, dest_y) + ' ', new_dir
