@@ -1,35 +1,34 @@
-(define (problem drone)
-	(:domain drone)
+(define (problem drone)(:domain drone)
 	(:objects
-		pos-1-1
-		pos-1-2
-		pos-1-3
-		pos-1-4
-		pos-1-5
-		pos-2-1
-		pos-2-2
-		pos-2-3
-		pos-2-4
-		pos-2-5
-		pos-3-1
-		pos-3-2
-		pos-3-3
-		pos-3-4
-		pos-3-5
-		pos-4-1
-		pos-4-2
-		pos-4-3
-		pos-4-4
-		pos-4-5
-		pos-5-1
-		pos-5-2
-		pos-5-3
-		pos-5-4
-		pos-5-5
+		pos-1-1 - position
+		pos-1-2 - position
+		pos-1-3 - position
+		pos-1-4 - position
+		pos-1-5 - position
+		pos-2-1 - position
+		pos-2-2 - position
+		pos-2-3 - position
+		pos-2-4 - position
+		pos-2-5 - position
+		pos-3-1 - position
+		pos-3-2 - position
+		pos-3-3 - position
+		pos-3-4 - position
+		pos-3-5 - position
+		pos-4-1 - position
+		pos-4-2 - position
+		pos-4-3 - position
+		pos-4-4 - position
+		pos-4-5 - position
+		pos-5-1 - position
+		pos-5-2 - position
+		pos-5-3 - position
+		pos-5-4 - position
+		pos-5-5 - position
 	)
 	(:init
-		(drone-at pos-3-4)
-		(dronr-dir south)
+		(drone-at pos-4-5)
+		( drone-to south)
 		(movable-forward pos-1-1 pos-1-2 north)
 		(movable-right pos-1-1 pos-2-1 north east)
 		(movable-forward pos-1-1 pos-2-1 east)

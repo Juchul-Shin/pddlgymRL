@@ -3,7 +3,7 @@ from random import randint
 import os
 
 INITIAL_FIXED_POSITON = '\t\tdrone-at pos-3-1\n'
-INITIAL_FIXED_DIRECTION = 't\tdrone-dir east\n'
+INITIAL_FIXED_DIRECTION = 't\t drone-to east\n'
 
 DIR_LIST = ['north', 'east', 'south', 'west']
 HEADING_LIST = ['right', 'left']
@@ -32,7 +32,7 @@ class ProblemGenerator():
         for x in range(1, self.grid_size + 1):
             for y in range(1, self.grid_size + 1):
                 objects_string += '\t\t'
-                objects_string += 'pos-{0}-{1}\n'.format(x, y)
+                objects_string += 'pos-{0}-{1} - position\n'.format(x, y)
         objects_string += '\t)\n'
         return objects_string
 
@@ -42,8 +42,8 @@ class ProblemGenerator():
             init_string += INITIAL_FIXED_POSITON
             init_string += INITIAL_FIXED_DIRECTION
         else:
-            init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(randint(1, 6), randint(1, 6))
-            init_string += '\t\t(dronr-dir {0})\n'.format(DIR_LIST[randint(0, 3)])
+            init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(randint(1, 5), randint(1, 5))
+            init_string += '\t\t( drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
         init_string += self.generate_static_predicates()
         init_string += '\t)\n'
         return init_string
