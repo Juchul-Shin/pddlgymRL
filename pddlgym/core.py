@@ -488,7 +488,7 @@ class PDDLEnv(gym.Env):
         return state, reward, done, debug_info
 
     def _get_new_state_info(self, state):
-        state = self._handle_derived_literals(state)
+        #state = self._handle_derived_literals(state)   속도 문제로 derived_literals 처리 삭제
 
         done = self._is_goal_reached(state)
 
