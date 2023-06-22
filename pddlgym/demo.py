@@ -4,6 +4,7 @@ import matplotlib; matplotlib.use('agg') # For rendering
 
 from pddlgym.utils import run_demo
 import pddlgym
+from tabular_rl import TabularRL
 
 def demo_random(env_name, render=True, problem_index=0, verbose=True):
     env = pddlgym.make("PDDLEnv{}-v0".format(env_name.capitalize()))
@@ -29,28 +30,14 @@ def run_all(render=True, verbose=True):
     # demo_random("quantifiedblocks", render=render, verbose=verbose)
     # demo_random("fridge", render=render, verbose=verbose)
 
-def convert_tabular_obs(obs):
-    for element in obs[0]:
-        if (element.predicate.name == 'drone-at'):
-            drone_at = element
-        if (element.predicate.name == 'drone-to'):
-            drone_to = element
-    drone_x = int(drone_at._str.split(':')[0].split('-')[2])
-    drone_y = int(drone_at._str.split(':')[0].split('-')[3])
-    drone_to = drone_to._str.split('(')[1].split(':')[0]
-    print(drone_to)
-    goal_x = int(obs[2]._str.split(':')[0].split('-')[2])
-    goal_y = int(obs[2]._str.split(':')[0].split('-')[3])
-    print(goal_x)
 
 if __name__ == '__main__':
     #run_all(render=False, verbose=True)
     env = pddlgym.make("PDDLEnvDrone-v0")
     env.fix_problem_index(0)
-    policy = lambda s : env.action_space.sample(s)
-    obs,_ = env.reset()
 
-    convert_tabular_obs(obs)
-    
+    rl = TabularRL(env)
+    rl.run_episode()
+
 
     run_demo(env, policy, render=False, verbose=True, seed=0)
