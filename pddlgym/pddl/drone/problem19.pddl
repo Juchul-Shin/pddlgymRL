@@ -28,7 +28,7 @@
 	)
 	(:init
 		(drone-at pos-2-4)
-		(drone-to west)
+		(drone-to north)
 		(movable-forward pos-1-1 pos-1-2 north)
 		(movable-right pos-1-1 pos-2-1 north east)
 		(movable-forward pos-1-1 pos-2-1 east)

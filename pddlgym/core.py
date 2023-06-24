@@ -437,7 +437,7 @@ class PDDLEnv(gym.Env):
         initial_state = State(frozenset(self._problem.initial_state),
                               frozenset(self._problem.objects),
                               self._problem.goal)
-        initial_state = self._handle_derived_literals(initial_state)
+        #initial_state = self._handle_derived_literals(initial_state)
         self.set_state(initial_state)
 
         self._goal = self._problem.goal

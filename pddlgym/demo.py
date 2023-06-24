@@ -37,7 +37,7 @@ if __name__ == '__main__':
     env.fix_problem_index(0)
 
     rl = TabularRL(env)
-    rl.run_episode()
+    #rl.run_episode()
 
 
-    run_demo(env, policy, render=False, verbose=True, seed=0)
+    #run_demo(env, policy, render=False, verbose=True, seed=0)

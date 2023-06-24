@@ -16,16 +16,30 @@ class ProblemGenerator():
         self.is_fixed_goal = True
         self.is_fixed_init = False  # type: bool
         self.problem_number = 0
+        self.goal_x = 3
+        self.goal_y = 5
 
-    def generate_problem(self, index=0):
-        filename = './pddlgym/pddl/drone/problem{0}.pddl'.format(index)
-        f = open(filename, 'w')
-        f.write('(define (problem drone)(:domain drone)\n')
-        f.write(self.generate_objects())
-        f.write(self.generate_init())
-        f.write(self.generate_goal())
-        f.write(')')
-        f.close()
+    def generate_problem(self, index=0, learning = 100, test = 50):
+        for index in range(0,learning):
+            filename = './pddlgym/pddl/drone/problem{0}.pddl'.format(index)
+            f = open(filename, 'w')
+            f.write('(define (problem drone)(:domain drone)\n')
+            f.write(self.generate_objects())
+            f.write(self.generate_init())
+            f.write(self.generate_goal())
+            f.write(')')
+            f.close()
+
+        for index in range(0,test):
+            filename = './pddlgym/pddl/drone_test/problem{0}.pddl'.format(index)
+            f = open(filename, 'w')
+            f.write('(define (problem drone)(:domain drone)\n')
+            f.write(self.generate_objects())
+            f.write(self.generate_init())
+            f.write(self.generate_goal())
+            f.write(')')
+            f.close()
+        
 
     def generate_objects(self):
         objects_string = '\t(:objects\n'
@@ -42,8 +56,15 @@ class ProblemGenerator():
             init_string += INITIAL_FIXED_POSITON
             init_string += INITIAL_FIXED_DIRECTION
         else:
-            init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(randint(1, 5), randint(1, 5))
-            init_string += '\t\t( drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
+            while True:
+                pos_x = randint(1, self.grid_size)
+                pos_y = randint(1, self.grid_size)
+                if (pos_x == self.goal_x) and (pos_y == self.goal_y):
+                    continue
+                else:
+                    init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(pos_x, pos_y)
+                    init_string += '\t\t(drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
+                    break
         init_string += self.generate_static_predicates()
         init_string += '\t)\n'
         return init_string
@@ -140,7 +161,7 @@ class ProblemGenerator():
         
         return goal_string
 
-
-pg = ProblemGenerator()
-pg.generate_problem()
+if __name__ == '__main__':
+    pg = ProblemGenerator()
+    pg.generate_problem()
 
