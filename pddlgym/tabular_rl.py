@@ -179,10 +179,11 @@ class TabularRL:
         print('Drone-At[{0},{1}], Drone-To[{2}], Goal-At[{3},{4}]'.format(drone_x, drone_y, drone_to, goal_x, goal_y))
 
 
-    def Q_learning(self, alpha = 0.05, num_episodes=2001, epsilon=0.3, gamma = 0.95, decay = 0.0004):
+    def Q_learning(self, alpha = 0.03, num_episodes=3001, epsilon=0.3, gamma = 0.95, decay = 0.0001):
         games_reward = []
         test_rewards = []
         episodes = []
+        initial_epsilon = epsilon
         for ep in range(1, num_episodes):
             obs , _ = self.env.reset()
             tabular_state = self._convert_obs(obs)
@@ -225,13 +226,11 @@ class TabularRL:
                 print("Learning Test Episode:{:5d}  Eps:{:2.4f}  Rew:{:2.4f}".format(ep, epsilon, test_reward))
                 test_rewards.append(test_reward)
                 episodes.append(ep)
-                if (test_reward > -3.):
-                    epsilon = 0.01
 
         plt.plot(episodes, test_rewards, 'b-')  # 파란색 실선으로 그래프 그리기
         plt.xlabel('Episode')  # x축 레이블 설정
         plt.ylabel('Average Reward')  # y축 레이블 설정
-        plt.title('Average Test Reward per 100 Episodes')  # 그래프 제목 설정
+        plt.title('Average Test Reward per 100 Episodes\nalpha={0}, initial_epsilon={1}, gamma = {2}, decay={3}'.format(alpha, initial_epsilon, gamma, decay))  # 그래프 제목 설정
         plt.show()  # 그래프 출력1
 
     def Test(self):
