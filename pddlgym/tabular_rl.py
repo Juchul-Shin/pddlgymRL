@@ -5,7 +5,7 @@ import time
 import numpy as np
 import problem_generator
 import pddlgym
-
+import matplotlib.pyplot as plt
 
 
 DIR_LIST = ['north', 'east', 'south', 'west']
@@ -39,7 +39,7 @@ def relative_coordinate(drone, other, grid_size=5):
 
 
 class TabularRL:
-    def __init__(self, env, default_value = -1000., grid_size=5):
+    def __init__(self, env, default_value = -10., grid_size=5):
         self.env = env
         #self.state_value = defaultdict(lambda : [default_value, default_value, default_value])
         self.action_value = defaultdict(lambda : [default_value, default_value, default_value])
@@ -63,9 +63,10 @@ class TabularRL:
         transformed_drone = transform_coordinate((drone_x, drone_y), drone_to, self.grid_size)
         transformed_goal = transform_coordinate((goal_x, goal_y), drone_to, self.grid_size)
         #get relative coordinate from drone to goal
-        relative_pos_to_goal =  (transformed_goal[0]-transformed_drone[0], transformed_goal[1]-transformed_drone[1])
+        relative_pos_obs =  (transformed_drone[0], transformed_drone[1], \
+                                 transformed_goal[0], transformed_goal[1])
 
-        return (relative_pos_to_goal, DIR_LIST.index(drone_to))
+        return relative_pos_obs
 
     def sample_action(self):
         valid_actions = list(sorted(self.env.action_space.all_ground_literals(self.obs, valid_only=True)))
@@ -77,29 +78,37 @@ class TabularRL:
         Run some episodes to test the policy
         '''
         total_rewards = []
-
-        
-
-        for _ in range(num_episodes):
+        for e in range(num_episodes):
             obs, _ = env.reset()
             tabular_state = self._convert_obs(obs)
             done = False
-            game_rew = 0
+            game_reward = 0
+            step_limit = 0
 
             while not done:
                 # select a greedy action
+
+
                 valid_actions = list(sorted(env.action_space.all_ground_literals(obs, valid_only=True)))
-                action = self.greedy(tabular_state, valid_actions)
+                action, _ = self.greedy(tabular_state, valid_actions)
+
+                if to_print:
+                    self.printobs(obs)
+                    print(action)
                 next_obs, rew, done, _ = env.step(action)
                 obs = next_obs
+                tabular_state = self._convert_obs(obs)
                 game_reward += rew 
                 
-                if done:
-                    state = env.reset()
+                if done or step_limit > 50:
                     total_rewards.append(game_reward)
+                    if to_print:
+                        print("Agent has arrived at the goal position\n\n")
+                    break
+                step_limit += 1
 
         if to_print:
-            print('Mean score: %.3f of %i games!'%(np.mean(tot_rew), num_episodes))
+            print('Mean score: %.3f of %i games!'%(np.mean(total_rewards), num_episodes))
 
         return np.mean(total_rewards)
 
@@ -119,6 +128,12 @@ class TabularRL:
     #### valid actions이 아닌 index가 뽑힌 경우 no greedy action에 빠짐
     def greedy(self, state, valid_actions):
         q_values = np.array(self.action_value[state])
+        # state에서 valid action이 아닌 경우는 큰 음의 값을 설정
+        valid_action_list = [action.predicate.name for action in valid_actions]
+        for index, action in enumerate(ACT_LIST):
+            if not action in valid_action_list:
+                q_values[index] = np.NINF
+                self.action_value[state][index] = np.NINF
         
         #Q값이 가장 큰 valid action 선택
         while(len(q_values) > 0):
@@ -146,12 +161,28 @@ class TabularRL:
         else:
             # Choose the action of a greedy policy
             return self.greedy(state, valid_actions)
+        
+    def printobs(self, obs):
+        for element in obs[0]:
+            if (element.predicate.name == 'drone-at'):
+                drone_at = element
+            if (element.predicate.name == 'drone-to'):
+                drone_to = element
+
+        drone_x = int(drone_at._str.split(':')[0].split('-')[2])
+        drone_y = int(drone_at._str.split(':')[0].split('-')[3])
+        drone_to = drone_to._str.split('(')[1].split(':')[0]
+        #get goal position
+        goal_x = int(obs[2]._str.split(':')[0].split('-')[2])
+        goal_y = int(obs[2]._str.split(':')[0].split('-')[3])
+        #transform coordinate by direction        
+        print('Drone-At[{0},{1}], Drone-To[{2}], Goal-At[{3},{4}]'.format(drone_x, drone_y, drone_to, goal_x, goal_y))
 
 
-    def Q_learning(self, alpha = 0.01, num_episodes=10000, epsilon=0.3, gamma = 0.95, decay = 0.00005):
+    def Q_learning(self, alpha = 0.05, num_episodes=2001, epsilon=0.3, gamma = 0.95, decay = 0.0004):
         games_reward = []
         test_rewards = []
-
+        episodes = []
         for ep in range(1, num_episodes):
             obs , _ = self.env.reset()
             tabular_state = self._convert_obs(obs)
@@ -159,7 +190,7 @@ class TabularRL:
             total_reward = 0
 
 
-            if epsilon > 0.01 :
+            if epsilon > 0.001 :
                 epsilon -= decay
             
             while not done:
@@ -189,24 +220,31 @@ class TabularRL:
                 if (done):
                     games_reward.append(total_reward)
 
-            if (ep % 300) == 0:
-                test_reward = self.run_episodes(self.env, 1000)
-                print("Learning Test Episode:{:5d}  Eps:{:2.4f}  Rew:{:2.4f}".format(ep, eps, test_reward))
+            if (ep % 100) == 0:
+                test_reward = self.run_episodes(self.env, 50)
+                print("Learning Test Episode:{:5d}  Eps:{:2.4f}  Rew:{:2.4f}".format(ep, epsilon, test_reward))
                 test_rewards.append(test_reward)
+                episodes.append(ep)
+                if (test_reward > -3.):
+                    epsilon = 0.01
+
+        plt.plot(episodes, test_rewards, 'b-')  # 파란색 실선으로 그래프 그리기
+        plt.xlabel('Episode')  # x축 레이블 설정
+        plt.ylabel('Average Reward')  # y축 레이블 설정
+        plt.title('Average Test Reward per 100 Episodes')  # 그래프 제목 설정
+        plt.show()  # 그래프 출력1
 
     def Test(self):
         env = pddlgym.make("PDDLEnvDroneTest-v0")
-        test_reward = self.run_episodes(self.env, 10)
-        print("Total Reward of 10 tests:{0}}".format(test_reward))
+        test_reward = self.run_episodes(self.env, 10, True)
+        print("Total Reward of 10 tests:{0}".format(test_reward))
 
     def __str__(self):
         str(self.state)
         
 if __name__ == '__main__':
 
-    env = pddlgym.make("PDDLEnvDrone-v0")
-    #seed = int(time.time())
-    #random.seed(seed)
+    env = pddlgym.make("PDDLEnvDrone-v0", seed = int(time.time()))
     rl = TabularRL(env)
     rl.Q_learning()
     rl.Test()
