@@ -16,11 +16,16 @@ class ProblemGenerator():
         self.is_fixed_goal = True
         self.is_fixed_init = False  # type: bool
         self.problem_number = 0
-        self.goal_x = 3
-        self.goal_y = 5
 
-    def generate_problem(self, index=0, learning = 100, test = 50):
+
+    def generate_problem(self, index=0, learning = 200, test = 100):
         for index in range(0,learning):
+            if not self.is_fixed_goal:
+                self.goal_x = 3
+                self.goal_y = 5
+            else:
+                self.goal_x = randint(1,5)
+                self.goal_y = randint(1,5)
             filename = './pddlgym/pddl/drone/problem{0}.pddl'.format(index)
             f = open(filename, 'w')
             f.write('(define (problem drone)(:domain drone)\n')
@@ -31,6 +36,12 @@ class ProblemGenerator():
             f.close()
 
         for index in range(0,test):
+            if not self.is_fixed_goal:
+                self.goal_x = 3
+                self.goal_y = 5
+            else:
+                self.goal_x = randint(1,5)
+                self.goal_y = randint(1,5)
             filename = './pddlgym/pddl/drone_test/problem{0}.pddl'.format(index)
             f = open(filename, 'w')
             f.write('(define (problem drone)(:domain drone)\n')
@@ -157,8 +168,8 @@ class ProblemGenerator():
     def generate_goal(self):
         goal_string = ''
         if (self.is_fixed_goal):
-            goal_string = '\t(:goal (drone-at pos-3-5))\n'
-        
+            goal_string = '\t(:goal (drone-at pos-{}-{}))\n'.format(self.goal_x, self.goal_y)
+
         return goal_string
 
 if __name__ == '__main__':

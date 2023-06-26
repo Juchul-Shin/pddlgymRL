@@ -179,11 +179,13 @@ class TabularRL:
         print('Drone-At[{0},{1}], Drone-To[{2}], Goal-At[{3},{4}]'.format(drone_x, drone_y, drone_to, goal_x, goal_y))
 
 
-    def Q_learning(self, alpha = 0.03, num_episodes=3001, epsilon=0.3, gamma = 0.95, decay = 0.0001):
+    def Q_learning(self, alpha = 0.01, num_episodes=3001, epsilon=0.3, gamma = 0.90, decay = 0.0001):
         games_reward = []
         test_rewards = []
         episodes = []
         initial_epsilon = epsilon
+        test_env = pddlgym.make("PDDLEnvDroneTest-v0")
+
         for ep in range(1, num_episodes):
             obs , _ = self.env.reset()
             tabular_state = self._convert_obs(obs)
@@ -222,7 +224,8 @@ class TabularRL:
                     games_reward.append(total_reward)
 
             if (ep % 100) == 0:
-                test_reward = self.run_episodes(self.env, 50)
+                
+                test_reward = self.run_episodes(test_env, 30)
                 print("Learning Test Episode:{:5d}  Eps:{:2.4f}  Rew:{:2.4f}".format(ep, epsilon, test_reward))
                 test_rewards.append(test_reward)
                 episodes.append(ep)
@@ -235,7 +238,7 @@ class TabularRL:
 
     def Test(self):
         env = pddlgym.make("PDDLEnvDroneTest-v0")
-        test_reward = self.run_episodes(self.env, 10, True)
+        test_reward = self.run_episodes(self.env, 30, True)
         print("Total Reward of 10 tests:{0}".format(test_reward))
 
     def __str__(self):
