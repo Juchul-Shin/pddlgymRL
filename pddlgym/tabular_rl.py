@@ -52,19 +52,25 @@ class TabularRL:
                 drone_at = element
             if (element.predicate.name == 'drone-to'):
                 drone_to = element
+            if (element.predicate.name == 'threat-at'):
+                threat_at = element
         
         drone_x = int(drone_at._str.split(':')[0].split('-')[2])
         drone_y = int(drone_at._str.split(':')[0].split('-')[3])
         drone_to = drone_to._str.split('(')[1].split(':')[0]
-        #get goal position
+        #get goal,threat position
         goal_x = int(obs[2]._str.split(':')[0].split('-')[2])
         goal_y = int(obs[2]._str.split(':')[0].split('-')[3])
+        threat_x = int(threat_at._str.split(':')[0].split('-')[2])
+        threat_y = int(threat_at._str.split(':')[0].split('-')[3])
         #transform coordinate by direction        
         transformed_drone = transform_coordinate((drone_x, drone_y), drone_to, self.grid_size)
         transformed_goal = transform_coordinate((goal_x, goal_y), drone_to, self.grid_size)
+        transformed_threat = transform_coordinate((threat_x, threat_y), drone_to, self.grid_size)
         #get relative coordinate from drone to goal
         relative_pos_obs =  (transformed_drone[0], transformed_drone[1], \
-                                 transformed_goal[0], transformed_goal[1])
+                            transformed_goal[0], transformed_goal[1],\
+                            transformed_threat[0], transformed_threat[1] )
 
         return relative_pos_obs
 
@@ -168,6 +174,8 @@ class TabularRL:
                 drone_at = element
             if (element.predicate.name == 'drone-to'):
                 drone_to = element
+            if (element.predicate.name == 'threat-at'):
+                threat_at = element
 
         drone_x = int(drone_at._str.split(':')[0].split('-')[2])
         drone_y = int(drone_at._str.split(':')[0].split('-')[3])
@@ -175,8 +183,10 @@ class TabularRL:
         #get goal position
         goal_x = int(obs[2]._str.split(':')[0].split('-')[2])
         goal_y = int(obs[2]._str.split(':')[0].split('-')[3])
-        #transform coordinate by direction        
-        print('Drone-At[{0},{1}], Drone-To[{2}], Goal-At[{3},{4}]'.format(drone_x, drone_y, drone_to, goal_x, goal_y))
+        threat_x = int(threat_at._str.split(':')[0].split('-')[2])
+        threat_y = int(threat_at._str.split(':')[0].split('-')[3])
+        
+        print('Drone-At[{0},{1}], Drone-To[{2}], Threat-At[{5},{6}]Goal-At[{3},{4}]'.format(drone_x, drone_y, drone_to, goal_x, goal_y, threat_x, threat_y))
 
 
     def Q_learning(self, alpha = 0.01, num_episodes=3001, epsilon=0.3, gamma = 0.90, decay = 0.0001):

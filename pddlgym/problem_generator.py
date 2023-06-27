@@ -17,6 +17,25 @@ class ProblemGenerator():
         self.is_fixed_init = False  # type: bool
         self.problem_number = 0
 
+    def random_threat(self):
+        while True:
+            self.threat_x = randint(2, self.grid_size-1)
+            self.threat_y = randint(2, self.grid_size-1)
+            if (self.threat_x == self.goal_x) and (self.threat_y == self.goal_y):
+                continue
+            else:
+                break
+    
+    def random_agent(self):
+        while True:
+            self.init_x = randint(1, self.grid_size)
+            self.init_y = randint(1, self.grid_size)
+            if (self.init_x == self.goal_x) and (self.init_y == self.goal_y):
+                continue
+            elif (self.init_x == self.threat_x) and (self.init_y == self.threat_y):
+                continue
+            else:
+                break
 
     def generate_problem(self, index=0, learning = 200, test = 100):
         for index in range(0,learning):
@@ -26,6 +45,7 @@ class ProblemGenerator():
             else:
                 self.goal_x = randint(1,5)
                 self.goal_y = randint(1,5)
+            self.random_threat()
             filename = './pddlgym/pddl/drone/problem{0}.pddl'.format(index)
             f = open(filename, 'w')
             f.write('(define (problem drone)(:domain drone)\n')
@@ -42,6 +62,7 @@ class ProblemGenerator():
             else:
                 self.goal_x = randint(1,5)
                 self.goal_y = randint(1,5)
+            self.random_threat()
             filename = './pddlgym/pddl/drone_test/problem{0}.pddl'.format(index)
             f = open(filename, 'w')
             f.write('(define (problem drone)(:domain drone)\n')
@@ -67,15 +88,11 @@ class ProblemGenerator():
             init_string += INITIAL_FIXED_POSITON
             init_string += INITIAL_FIXED_DIRECTION
         else:
-            while True:
-                pos_x = randint(1, self.grid_size)
-                pos_y = randint(1, self.grid_size)
-                if (pos_x == self.goal_x) and (pos_y == self.goal_y):
-                    continue
-                else:
-                    init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(pos_x, pos_y)
-                    init_string += '\t\t(drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
-                    break
+            self.random_agent()
+            init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(self.init_x, self.init_y)
+            init_string += '\t\t(drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
+            init_string += '\t\t(threat-at pos-{0}-{1})\n'.format(self.threat_x, self.threat_y)
+                   
         init_string += self.generate_static_predicates()
         init_string += '\t)\n'
         return init_string
