@@ -1,5 +1,6 @@
 import random
 from random import randint
+import time
 import os
 
 INITIAL_FIXED_POSITON = '\t\tdrone-at pos-3-1\n'
@@ -16,6 +17,8 @@ class ProblemGenerator():
         self.is_fixed_goal = True
         self.is_fixed_init = False  # type: bool
         self.problem_number = 0
+        seed = int(time.time())
+        random.seed(seed)
 
     def random_threat(self):
         while True:
@@ -37,7 +40,20 @@ class ProblemGenerator():
             else:
                 break
 
-    def generate_problem(self, index=0, learning = 200, test = 100):
+    def random_target(self):
+        while True:
+            self.target_x = randint(2, self.grid_size-1)
+            self.target_y = randint(2, self.grid_size-1)
+            if (self.target_x == self.goal_x) and (self.target_y == self.goal_y):
+                continue
+            elif (self.target_x == self.threat_x) and (self.target_y == self.threat_y):
+                continue
+            elif (self.target_x == self.init_x) and (self.target_y == self.init_y):
+                continue
+            else:
+                break        
+
+    def generate_problem(self, index=0, learning = 1000, test = 500):
         for index in range(0,learning):
             if not self.is_fixed_goal:
                 self.goal_x = 3
@@ -89,9 +105,12 @@ class ProblemGenerator():
             init_string += INITIAL_FIXED_DIRECTION
         else:
             self.random_agent()
+            self.random_target()
             init_string += '\t\t(drone-at pos-{0}-{1})\n'.format(self.init_x, self.init_y)
             init_string += '\t\t(drone-to {0})\n'.format(DIR_LIST[randint(0, 3)])
             init_string += '\t\t(threat-at pos-{0}-{1})\n'.format(self.threat_x, self.threat_y)
+            init_string += '\t\t(threat-at pos-{0}-{1})\n'.format(self.target_x, self.target_y)
+            
                    
         init_string += self.generate_static_predicates()
         init_string += '\t)\n'

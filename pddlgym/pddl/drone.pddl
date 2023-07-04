@@ -8,8 +8,8 @@
         (movable-left ?v0 - position ?v1 - position ?v2 - direction ?v3 - direction)
         (movable-right ?v0 - position ?v1 - position ?v2 - direction ?v3 - direction)
         (movable-forward ?v0 - position ?v1 - position ?v2 - direction)
-        ;(target-at ?v0 - position)
-        ;(target-acquired)
+        (target-at ?v0 - position)
+        (target-acquired)
     )
     (:constants 
         north - direction
