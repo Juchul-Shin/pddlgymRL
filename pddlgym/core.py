@@ -525,9 +525,9 @@ class PDDLEnv(gym.Env):
 
     def extrinsic_reward(self, state, done):
         if done:
-            reward = 0.     #for the shortest path
+            reward = 1.     
         else:
-            reward = -1.
+            reward = 0.
 
         return reward
 
