@@ -27,8 +27,8 @@
 		pos-5-5 - position
 	)
 	(:init
-		(drone-at pos-3-1)
-		(drone-to west)
+		(drone-at pos-5-2)
+		(drone-to north)
 		(threat-at pos-2-4)
 		(threat-at pos-2-3)
 		(movable-forward pos-1-1 pos-1-2 north)
@@ -272,5 +272,5 @@
 		(movable-forward pos-5-5 pos-4-5 west)
 		(movable-left pos-5-5 pos-5-4 west south)
 	)
-	(:goal (drone-at pos-4-1))
+	(:goal (drone-at pos-3-1))
 )

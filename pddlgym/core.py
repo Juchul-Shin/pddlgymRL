@@ -527,7 +527,7 @@ class PDDLEnv(gym.Env):
         if done:
             reward = 1.     
         else:
-            reward = 0.
+            reward = -0.001
 
         return reward
 

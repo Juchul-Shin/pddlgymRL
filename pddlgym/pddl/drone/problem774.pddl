@@ -27,10 +27,10 @@
 		pos-5-5 - position
 	)
 	(:init
-		(drone-at pos-4-5)
-		(drone-to north)
+		(drone-at pos-1-3)
+		(drone-to south)
 		(threat-at pos-4-4)
-		(threat-at pos-4-2)
+		(threat-at pos-2-2)
 		(movable-forward pos-1-1 pos-1-2 north)
 		(movable-right pos-1-1 pos-2-1 north east)
 		(movable-forward pos-1-1 pos-2-1 east)
