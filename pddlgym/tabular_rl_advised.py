@@ -118,7 +118,7 @@ class TabularRL:
 
 
 
-    def Q_learning(self, alpha = 0.01, num_episodes=30000, epsilon=0.3, gamma = 0.90, decay = 0.00001, num_threat = 0):
+    def Q_learning(self, alpha = 0.1, num_episodes=30000, epsilon=0.3, gamma = 0.90, decay = 0.00001, num_threat = 0):
         
         games_reward = []
         test_rewards = []
